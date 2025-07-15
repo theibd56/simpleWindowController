@@ -28,7 +28,6 @@ A simple yet powerful AutoHotkey script that lets you:
 | `Ctrl + Alt + T` | Toggle transparency & always-on-top for the selected window|
 | `Ctrl + Alt + ↑` | Increase transparency (less visible)                       |
 | `Ctrl + Alt + ↓` | Decrease transparency (more visible)                       |
-| `Ctrl + Alt + W` | Show active window title in a tooltip                      |
 
 
 ## How to use?
@@ -39,7 +38,6 @@ A simple yet powerful AutoHotkey script that lets you:
 4. Hover over the window you want and press `Ctrl + Alt + S`  
 5. Toggle transparency with `Ctrl + Alt + T`  
 6. Adjust with arrow keys while holding `Ctrl + Alt`  
-7. Use `Ctrl + Alt + W` to show the current active window's title
 
 
 ## Technical details
