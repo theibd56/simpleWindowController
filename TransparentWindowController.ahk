@@ -1,92 +1,89 @@
-﻿#NoEnv
+#NoEnv
 SendMode Input
 SetWorkingDir %A_ScriptDir%
-SetTitleMatchMode, 2  ; Partial match for window titles
+SetTitleMatchMode, 2
 
 ; Initial settings
-WinTitle := ""            ; Selected window (empty at start)
-transparencyLevel := 180  ; Initial transparency level (0-255)
-transparencyStep := 10    ; Step to increase/decrease transparency
+winID := ""               ; Will hold window ID
+transparencyLevel := 180  ; Initial transparency level
+transparencyStep := 10
 
-; Hotkey Ctrl+Alt+S — select window under cursor
+; Ctrl+Alt+S — select window under cursor
 ^!s::
     MouseGetPos,,, winID
-    WinGetTitle, selectedTitle, ahk_id %winID%
-    if (selectedTitle = "") {
-        MsgBox, Could not get the title of the window under the cursor!
+    if (!winID) {
+        MsgBox, Could not get window under cursor!
         return
     }
-    WinTitle := selectedTitle
-    ToolTip, Selected window:`n%WinTitle%
+    WinGetTitle, selectedTitle, ahk_id %winID%
+    ToolTip, Selected window:`n%selectedTitle%
     SetTimer, RemoveToolTip, -500
 return
 
-; Hotkey Ctrl+Alt+T — toggle transparency and mouse-through on selected window
+; Ctrl+Alt+T — toggle transparency and click-through
 ^!t::
-    if (WinTitle = "") {
+    if (!winID) {
         MsgBox, Please select a window first with Ctrl+Alt+S!
         return
     }
 
-    if !WinExist(WinTitle) {
-        MsgBox, Window "%WinTitle%" not found!
+    if !WinExist("ahk_id " . winID) {
+        MsgBox, Selected window no longer exists!
         return
     }
 
-    WinGet, ExStyle, ExStyle, %WinTitle%
-    MouseTransparentOn := ExStyle & 0x20  ; Check WS_EX_TRANSPARENT flag
+    WinGet, ExStyle, ExStyle, ahk_id %winID%
+    MouseTransparentOn := ExStyle & 0x20
 
     if (MouseTransparentOn) {
-        ; Turn off transparency and mouse-through
-        WinSet, Transparent, OFF, %WinTitle%
-        WinSet, ExStyle, -0x20, %WinTitle%
-        WinSet, AlwaysOnTop, OFF, %WinTitle%
-        ToolTip, Window "%WinTitle%": transparency OFF
+        WinSet, Transparent, OFF, ahk_id %winID%
+        WinSet, ExStyle, -0x20, ahk_id %winID%
+        WinSet, AlwaysOnTop, OFF, ahk_id %winID%
+         ; ToolTip, Transparency OFF
     } else {
-        ; Turn on transparency and mouse-through with current level
-        WinSet, Transparent, %transparencyLevel%, %WinTitle%
-        WinSet, ExStyle, +0x20, %WinTitle%
-        WinSet, AlwaysOnTop, ON, %WinTitle%
-        ToolTip, Window "%WinTitle%": transparency ON (%transparencyLevel%)
+        WinSet, Transparent, %transparencyLevel%, ahk_id %winID%
+        WinSet, ExStyle, +0x20, ahk_id %winID%
+        WinSet, AlwaysOnTop, ON, ahk_id %winID%
+         ; ToolTip, Transparency ON (%transparencyLevel%)
     }
     SetTimer, RemoveToolTip, -500
 return
 
-; Ctrl+Alt+Up — increase transparency (window becomes more see-through)
+; Ctrl+Alt+Up — increase transparency
 ^!Up::
-    if (WinTitle = "") {
+    if (!winID) {
         MsgBox, Please select a window first with Ctrl+Alt+S!
         return
     }
     transparencyLevel += transparencyStep
     if (transparencyLevel > 255)
         transparencyLevel := 255
-    if WinExist(WinTitle)
-        WinSet, Transparent, %transparencyLevel%, %WinTitle%
-    ToolTip, Transparency increased: %transparencyLevel%
-    SetTimer, RemoveToolTip, -500
+    if WinExist("ahk_id " . winID)
+        WinSet, Transparent, %transparencyLevel%, ahk_id %winID%
+    ; ToolTip, Transparency increased: %transparencyLevel%
+    ; SetTimer, RemoveToolTip, -500
 return
 
-; Ctrl+Alt+Down — decrease transparency (window becomes more opaque)
+; Ctrl+Alt+Down — decrease transparency
 ^!Down::
-    if (WinTitle = "") {
+    if (!winID) {
         MsgBox, Please select a window first with Ctrl+Alt+S!
         return
     }
     transparencyLevel -= transparencyStep
     if (transparencyLevel < 0)
         transparencyLevel := 0
-    if WinExist(WinTitle)
-        WinSet, Transparent, %transparencyLevel%, %WinTitle%
-    ToolTip, Transparency decreased: %transparencyLevel%
-    SetTimer, RemoveToolTip, -500
+    if WinExist("ahk_id " . winID)
+        WinSet, Transparent, %transparencyLevel%, ahk_id %winID%
+    ; ToolTip, Transparency decreased: %transparencyLevel%
+    ; SetTimer, RemoveToolTip, -500
 return
 
 RemoveToolTip:
     ToolTip
 return
 
-; Ctrl+Alt+W — show active window title in tooltip
+; Ctrl+Alt+W — show title of active window
 ^!w::
     WinGetTitle, currentTitle, A
     ToolTip, Active window:`n%currentTitle%
